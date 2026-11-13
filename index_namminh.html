@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 6: Mạng Thông Tin Toàn Cầu - Tin Học 6</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #030712;
+            color: #f8fafc;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+        }
+
+        .network-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.25;
+            background-image: radial-gradient(#38bdf8 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .presentation-container {
+            width: 95vw;
+            height: 90vh;
+            max-width: 1400px;
+            max-height: 850px;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            box-shadow: 0 0 50px rgba(56, 189, 248, 0.15), inset 0 0 2px rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .slide {
+            display: none;
+            padding: 40px 60px;
+            height: calc(100% - 70px);
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        h1.slide-title {
+            font-size: 2.8rem;
+            color: #38bdf8;
+            margin-bottom: 20px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, #38bdf8, #a855f7, transparent) 1;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+		h1.slide-titleC {
+            font-size: 2.5rem;
+            color: #38bdf8;
+            margin-bottom: 20px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, #38bdf8, #a855f7, transparent) 1;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+        p, li {
+            font-size: 1.4rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+        }
+
+        ul {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 15px;
+        }
+
+        strong {
+            color: #fbbf24;
+            text-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+        }
+
+        .box {
+            background: rgba(30, 41, 59, 0.6);
+            border-left: 5px solid #38bdf8;
+            border-radius: 0 16px 16px 0;
+            padding: 20px 25px;
+            margin: 15px 0;
+            font-size: 1.35rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 15px;
+        }
+
+        .controls {
+            height: 70px;
+            background: rgba(3, 7, 18, 0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            border-top: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: white;
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            padding: 12px 28px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 0 15px rgba(2, 132, 199, 0.3);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #334155;
+            border-color: #475569;
+            color: #64748b;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .slide-number {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #38bdf8;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #38bdf8, #a855f7, #fbbf24);
+            box-shadow: 0 0 10px #38bdf8;
+            transition: width 0.3s ease;
+        }
+
+        /* --- STYLING TRÌNH DUYỆT WEB --- */
+        .browser-buttons-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 15px 0 10px;
+            flex-wrap: wrap;
+        }
+
+        .browser-tab-btn {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid #38bdf8;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        .browser-tab-btn:hover {
+            background: #0284c7;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .browser-tab-btn.active {
+            background: #fbbf24;
+            color: #030712;
+            border-color: #f59e0b;
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.7);
+        }
+
+        .browser-preview-box {
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid rgba(56, 189, 248, 0.4);
+            border-radius: 16px;
+            padding: 15px 25px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+            margin-bottom: 15px;
+        }
+
+        .browser-preview-content {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .browser-preview-content.active {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .browser-mockup {
+            flex: 1;
+            background: #1e293b;
+            border-radius: 10px;
+            border: 1px solid #475569;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .mockup-header {
+            background: #0f172a;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .mockup-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .mockup-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .mockup-url {
+            background: #1e293b;
+            color: #94a3b8;
+            padding: 4px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .mockup-body {
+            height: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .browser-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .browser-info h4 {
+            font-size: 1.6rem;
+            color: #38bdf8;
+            margin-bottom: 8px;
+        }
+
+        .browser-info p {
+            font-size: 1.15rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+
+        .icon-svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        /* GAME STYLES */
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .matching-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .matching-column h3 {
+            font-size: 1.5rem;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .match-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            border-radius: 14px;
+            padding: 18px 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            min-height: 75px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .match-card:hover {
+            border-color: #38bdf8;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            transform: scale(1.02);
+        }
+
+        .match-card.selected {
+            background: linear-gradient(135deg, #0284c7, #0d9488) !important;
+            border-color: #38bdf8 !important;
+            color: #fff;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
+        }
+
+        .match-card.correct {
+            background: linear-gradient(135deg, #15803d, #047857) !important;
+            border-color: #4ade80 !important;
+            color: #fff;
+            cursor: default;
+            transform: none !important;
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);
+        }
+
+        .match-card.wrong {
+            background: linear-gradient(135deg, #b91c1c, #991b1b) !important;
+            border-color: #f87171 !important;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(248, 113, 113, 0.4);
+        }
+
+        .domain-game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .domain-options {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .domain-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid #38bdf8;
+            color: white;
+            padding: 10px 22px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        .domain-btn:hover {
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .domain-btn.selected {
+            background: #fbbf24;
+            color: #030712;
+            border-color: #f59e0b;
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.7);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .category-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px dashed rgba(56, 189, 248, 0.4);
+            border-radius: 16px;
+            padding: 15px;
+            min-height: 150px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .category-box:hover {
+            border-color: #a855f7;
+            background: rgba(30, 41, 59, 0.9);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+
+        .category-box h4 {
+            font-size: 1.4rem;
+            color: #38bdf8;
+            margin-bottom: 8px;
+        }
+
+        .placed-item {
+            background: linear-gradient(135deg, #16a34a, #0d9488);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin: 6px 0;
+            font-size: 1.1rem;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .quiz-game-wrapper {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 20px;
+            padding: 20px 25px;
+            margin-top: 5px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+            max-height: 560px;
+            overflow-y: auto;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed rgba(56, 189, 248, 0.3);
+        }
+
+        .quiz-progress-badge {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.4);
+        }
+
+        .quiz-score-badge {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 0 10px rgba(217, 119, 6, 0.4);
+        }
+
+        .quiz-question-box {
+            font-size: 1.35rem;
+            font-weight: bold;
+            color: #fbbf24;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+        }
+
+        .quiz-note {
+            font-size: 1.1rem;
+            color: #38bdf8;
+            font-style: italic;
+            margin-bottom: 12px;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border-left: 3px solid #38bdf8;
+        }
+
+        .quiz-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .quiz-game-opt {
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(71, 85, 105, 0.8);
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .quiz-game-opt:hover {
+            border-color: #38bdf8;
+            background: rgba(51, 65, 85, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .quiz-game-opt.selected-multi {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.2);
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+        }
+
+        .quiz-game-opt.correct {
+            background: linear-gradient(135deg, #15803d, #047857) !important;
+            border-color: #4ade80 !important;
+            color: white;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+        }
+
+        .quiz-game-opt.wrong {
+            background: linear-gradient(135deg, #b91c1c, #991b1b) !important;
+            border-color: #f87171 !important;
+            color: white;
+            box-shadow: 0 0 20px rgba(248, 113, 113, 0.5);
+        }
+
+        /* STYLING RIÊNG CHO CÂU HỎI NỐI CỘT A - B */
+        .match-columns-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .match-col {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 14px;
+            padding: 15px;
+        }
+
+        .match-col h4 {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #38bdf8;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .match-item {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid rgba(71, 85, 105, 0.8);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+
+        .match-item:hover {
+            border-color: #38bdf8;
+            background: rgba(51, 65, 85, 0.9);
+        }
+
+        .match-item.selected {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.25);
+            color: #fbbf24;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+        }
+
+        .match-item.paired {
+            background: linear-gradient(135deg, #15803d, #047857);
+            border-color: #4ade80;
+            color: #fff;
+            cursor: default;
+        }
+
+        .quiz-feedback-box {
+            margin-top: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* FORM NHẬP THÔNG TIN HỌC SINH */
+        .student-form-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: rgba(30, 41, 59, 0.85);
+            border: 2px solid #38bdf8;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.3rem;
+            color: #38bdf8;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: #fff;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #fbbf24;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 1.25rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        th, td {
+            border: 1px solid rgba(71, 85, 105, 0.8);
+            padding: 14px 18px;
+            text-align: left;
+        }
+
+        th {
+            background: linear-gradient(90deg, #0284c7, #0369a1);
+            color: white;
+            font-size: 1.35rem;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(30, 41, 59, 0.6);
+        }
+        
+        tr:nth-child(odd) {
+            background-color: rgba(15, 23, 42, 0.6);
+        }
+
+        /* THANH ĐIỀU KHIỂN LỜI GIẢNG AI (GIỌNG NAMMINH) */
+        .tts-floating-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(12px);
+            border: 1px solid #38bdf8;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.4);
+            border-radius: 50px;
+            padding: 8px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Segoe UI', sans-serif;
+            color: #f8fafc;
+        }
+
+        .tts-btn {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            border: none;
+            color: white;
+            padding: 7px 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.15s, background 0.2s;
+        }
+
+        .tts-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+        }
+
+        .tts-btn.stop {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+        }
+
+        .tts-btn.stop:hover {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+        }
+
+        .tts-voice-select {
+            background: #1e293b;
+            color: #38bdf8;
+            border: 1px solid #38bdf8;
+            border-radius: 15px;
+            padding: 5px 10px;
+            font-size: 12px;
+            max-width: 175px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .tts-status {
+            font-size: 12px;
+            color: #7dd3fc;
+            max-width: 130px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tts-auto-label {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            color: #cbd5e1;
+            border-left: 1px solid #334155;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="network-bg"></div>
+
+    <div class="presentation-container">
+        <div class="progress-bar" id="progress"></div>
+
+        <!-- SLIDE 1: GIỚI THIỆU -->
+        <div class="slide active">
+            <div style="text-align: center; margin: auto 0; padding-top: 10px;">
+                <p style="font-size: 1.6rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 3px; font-weight: bold; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);">Chủ đề 3: Tổ chức lưu trữ, tìm kiếm và trao đổi thông tin</p>
+                <h1 style="font-size: 4rem; color: #fbbf24; margin: 25px 0; line-height: 1.2; text-shadow: 0 0 25px rgba(251, 191, 36, 0.4);">🌐 BÀI 6: MẠNG THÔNG TIN TOÀN CẦU</h1>
+                <p style="font-size: 1.5rem; color: #94a3b8;font-weight: bold;">Môn Tin học 6 — Thời lượng: 1 Tiết (45 Phút)</p>
+                <p style="font-size: 2.0rem; color: #38bdf8; font-weight: bold;">Giáo viên: ĐẶNG ĐĂNG HÀ</p>
+
+                <div class="box" style="max-width: 850px; margin: 35px auto 0; text-align: left; border-left-color: #a855f7;">
+                    🎯<a href="clip.mp4" target="_blank" style="text-decoration: none;">
+						<strong style="color: #c084fc; cursor: pointer;">MỤC TIÊU BÀI HỌC KẾT NỐI:</strong>
+					</a>
+                    <ul>
+                        <li>Hiểu bản chất World Wide Web (WWW), Website, Trình duyệt, Siêu liên kết.</li>
+                        <li>Thao tác thành thạo trình duyệt web để truy cập và lưu địa chỉ học tập (Bookmark).</li>
+                        <li>Nhận biết sự khác biệt giữa Tìm kiếm truyền thống và Tìm kiếm tích hợp AI.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: KHỞI ĐỘNG - GAME GHÉP CẶP -->
+        <div class="slide">
+            <h1 class="slide-title">🎮 KHỞI ĐỘNG: GHÉP CẶP KẾT NỐI THÔNG MINH</h1>
+            <p style="font-size: 1.3rem; margin-bottom: 10px;">Bấm chọn 1 <strong>Thuật ngữ</strong> (Cột trái) rồi chọn <strong>Ý nghĩa/Biểu tượng</strong> tương ứng (Cột phải)!</p>
+            
+            <div class="matching-container">
+                <div class="matching-column">
+                    <h3 style="background: linear-gradient(90deg, #0284c7, #0d9488); color: white;">📌 CỘT A: THUẬT NGỮ KHÔNG GIAN SỐ</h3>
+                    <div class="match-card" data-id="1" onclick="selectCard(this, 'left')">
+                        <span>1. World Wide Web (WWW)</span>
+                    </div>
+                    <div class="match-card" data-id="2" onclick="selectCard(this, 'left')">
+                        <span>2. Trình duyệt Web</span>
+                    </div>
+                    <div class="match-card" data-id="3" onclick="selectCard(this, 'left')">
+                        <span>3. Siêu liên kết (Hyperlink)</span>
+                    </div>
+                    <div class="match-card" data-id="4" onclick="selectCard(this, 'left')">
+                        <span>4. Website</span>
+                    </div>
+                </div>
+
+                <div class="matching-column">
+                    <h3 style="background: linear-gradient(90deg, #d97706, #b45309); color: white;">💡 CỘT B: BẢN CHẤT & CHỨC NĂNG</h3>
+                    <div class="match-card" data-id="3" onclick="selectCard(this, 'right')">
+                        <span>🔗 Dẫn người dùng sang một trang web khác khi nhấp chuột</span>
+                    </div>
+                    <div class="match-card" data-id="1" onclick="selectCard(this, 'right')">
+                        <span>🌐 Mạng thông tin toàn cầu liên kết các website trên Internet</span>
+                    </div>
+                    <div class="match-card" data-id="4" onclick="selectCard(this, 'right')">
+                        <span>🏠 Tập hợp các trang web liên quan dưới một địa chỉ truy cập</span>
+                    </div>
+                    <div class="match-card" data-id="2" onclick="selectCard(this, 'right')">
+                        <span>🚀 Phần mềm giúp người dùng lướt web (Chrome, Cốc Cốc, Edge)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="game1-status" style="margin-top: 20px; font-size: 1.5rem; font-weight: bold; text-align: center; color: #4ade80; height: 35px;"></div>
+        </div>
+
+        <!-- SLIDE 3: SO SÁNH TỔ CHỨC THÔNG TIN -->
+        <div class="slide">
+            <h1 class="slide-title">1. TỔ CHỨC THÔNG TIN TRÊN INTERNET</h1>
+            <p style="font-size: 1.4rem; margin-bottom: 15px;">Sự chuyển dịch từ <strong>Sách giáo khoa truyền thống</strong> sang <strong>Mạng thông tin toàn cầu</strong>:</p>
+            
+            <div class="grid-2">
+                <div class="box" style="border-left-color: #f59e0b;">
+                    <h3 style="color: #fbbf24; font-size: 1.6rem; margin-bottom: 10px;">📖 Sách Giáo Khoa (Môi trường Tĩnh)</h3>
+                    <ul>
+                        <li>Tổ chức <strong>tuyến tính</strong> (theo thứ tự bài, chương từ trước ra sau).</li>
+                        <li>Chủ yếu chứa văn bản và hình ảnh cố định.</li>
+                        <li>Muốn tra thông tin phải giở từng trang theo thứ tự.</li>
+                    </ul>
+                </div>
+                <div class="box" style="border-left-color: #10b981;">
+                    <h3 style="color: #34d399; font-size: 1.6rem; margin-bottom: 10px;">🌐 Mạng WWW (Không Gian Số Dynamic)</h3>
+                    <ul>
+                        <li>Tổ chức <strong>phi tuyến tính</strong> (nối với nhau qua liên kết).</li>
+                        <li>Đa dạng: Văn bản, hình ảnh, âm thanh, video, ứng dụng...</li>
+                        <li>Nhấp chuột vào <strong>Siêu liên kết</strong> để nhảy tức thời tới nội dung bất kỳ.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: CÁC KHÁI NIỆM CỐT LÕI -->
+        <div class="slide">
+            <h1 class="slide-title">CÁC NÚT MẠNG KHÁI NIỆM CỐT LÕI</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px;">
+                <div class="box">
+                    <h3 style="color: #38bdf8;">1. Siêu văn bản (Hypertext)</h3>
+                    <p style="font-size: 1.25rem;">Là loại văn bản tích hợp đa phương tiện và chứa các <strong>siêu liên kết</strong> đến các siêu văn bản khác.</p>
+                </div>
+                <div class="box">
+                    <h3 style="color: #38bdf8;">2. Trang web & Trang chủ</h3>
+                    <p style="font-size: 1.25rem;">Trang web là siêu văn bản được gán địa chỉ. <strong>Trang chủ (Homepage)</strong> là trang xuất hiện đầu tiên khi mở website.</p>
+                </div>
+                <div class="box">
+                    <h3 style="color: #38bdf8;">3. Website</h3>
+                    <p style="font-size: 1.25rem;">Là một tập hợp gồm một hoặc nhiều trang web liên quan được tổ chức dưới <strong>một địa chỉ truy cập chung</strong>.</p>
+                </div>
+                <div class="box">
+                    <h3 style="color: #38bdf8;">4. World Wide Web (WWW)</h3>
+                    <p style="font-size: 1.25rem;">Mạng thông tin toàn cầu, liên kết các website khắp thế giới qua kết nối Internet.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: TRÌNH DUYỆT WEB & KỸ NĂNG SỐ BẮT BUỘC -->
+        <div class="slide">
+            <h1 class="slide-title">2. TRÌNH DUYỆT WEB — CỔNG KẾT NỐI MẠNG</h1>
+            <p style="font-size: 1.25rem; margin-bottom: 5px;">Trình duyệt web là phần mềm ứng dụng giúp người dùng truy cập các trang web trên WWW. <strong>Bấm vào tên từng trình duyệt bên dưới để xem logo và giao diện thực tế:</strong></p>
+            
+            <div class="browser-buttons-container">
+                <button class="browser-tab-btn active" onclick="showBrowser(this, 'chrome')">
+                    <svg class="icon-svg" viewBox="0 0 48 48">
+                        <path fill="#4285F4" d="M24 12v12h18.9A24 24 0 0 0 24 0v12z"/>
+                        <path fill="#34A853" d="M24 36c-6.63 0-12-5.37-12-12 0-2.34.67-4.52 1.83-6.36L3.48 7.3A24 24 0 0 0 0 24c0 13.25 10.75 24 24 24l10.35-10.35C30.52 35.33 27.34 36 24 36z"/>
+                        <path fill="#FBBC05" d="M48 24c0-3.34-.67-6.52-1.83-9.43L35.82 24.92A11.94 11.94 0 0 1 36 24c0 6.63-5.37 12-12 12v12c13.25 0 24-10.75 24-24z"/>
+                        <path fill="#EA4335" d="M24 12A11.94 11.94 0 0 1 34.35 18l10.35-10.35C40.35 3.02 32.72 0 24 0 14.85 0 6.84 5.16 2.65 12.72l10.35 10.35C14.82 16.03 19 12 24 12z"/>
+                        <circle cx="24" cy="24" r="8" fill="#FFF"/>
+                        <circle cx="24" cy="24" r="6" fill="#1a73e8"/>
+                    </svg>
+                    Google Chrome
+                </button>
+                <button class="browser-tab-btn" onclick="showBrowser(this, 'coccoc')">
+                    <svg class="icon-svg" viewBox="0 0 48 48">
+                        <circle cx="24" cy="24" r="22" fill="#22C55E"/>
+                        <path fill="#FFF" d="M24 10A14 14 0 1 0 38 24 14 14 0 0 0 24 10zm0 22a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+                    </svg>
+                    Cốc Cốc
+                </button>
+                <button class="browser-tab-btn" onclick="showBrowser(this, 'edge')">
+                    <svg class="icon-svg" viewBox="0 0 48 48">
+                        <path fill="#0284C7" d="M24 4A20 20 0 1 0 44 24 20 20 0 0 0 24 4zm2 30c-5.52 0-10-4.48-10-10s4.48-10 10-10 10 4.48 10 10-4.48 10-10 10z"/>
+                        <path fill="#38BDF8" d="M36 24a12 12 0 1 1-24 0 12 12 0 0 1 24 0z"/>
+                    </svg>
+                    Microsoft Edge
+                </button>
+                <button class="browser-tab-btn" onclick="showBrowser(this, 'firefox')">
+                    <svg class="icon-svg" viewBox="0 0 48 48">
+                        <circle cx="24" cy="24" r="22" fill="#F97316"/>
+                        <path fill="#FACC15" d="M24 8a16 16 0 1 0 16 16A16 16 0 0 0 24 8zm0 24a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+                    </svg>
+                    Mozilla Firefox
+                </button>
+            </div>
+
+            <div class="browser-preview-box">
+                <!-- Chrome Preview -->
+                <div id="prev-chrome" class="browser-preview-content active">
+                    <div class="browser-mockup">
+                        <div class="mockup-header">
+                            <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444;"></div><div class="mockup-dot" style="background:#eab308;"></div><div class="mockup-dot" style="background:#22c55e;"></div></div>
+                            <div class="mockup-url">🔒 https://www.google.com</div>
+                        </div>
+                        <div class="mockup-body" style="background: linear-gradient(135deg, #1e293b, #0f172a);">
+                            <span style="font-size: 2rem;">🌐 Google Chrome</span>
+                            <span style="color:#94a3b8; font-size:1rem;">Giao diện lướt web tốc độ cao & ổn định nhất</span>
+                        </div>
+                    </div>
+                    <div class="browser-info">
+                        <h4>Google Chrome</h4>
+                        <p>Trình duyệt web phổ biến nhất thế giới do Google phát triển, nổi bật với tốc độ xử lý trang nhanh và đồng bộ tài khoản Google tiện lợi.</p>
+                    </div>
+                </div>
+
+                <!-- Cốc Cốc Preview -->
+                <div id="prev-coccoc" class="browser-preview-content">
+                    <div class="browser-mockup">
+                        <div class="mockup-header">
+                            <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444;"></div><div class="mockup-dot" style="background:#eab308;"></div><div class="mockup-dot" style="background:#22c55e;"></div></div>
+                            <div class="mockup-url">🔒 https://coccoc.com</div>
+                        </div>
+                        <div class="mockup-body" style="background: linear-gradient(135deg, #065f46, #0f172a);">
+                            <span style="font-size: 2rem;">🍒 Trình duyệt Cốc Cốc</span>
+                            <span style="color:#94a3b8; font-size:1rem;">Tích hợp công cụ hỗ trợ người dùng Việt Nam</span>
+                        </div>
+                    </div>
+                    <div class="browser-info">
+                        <h4>Trình duyệt Cốc Cốc</h4>
+                        <p>Trình duyệt web dành riêng cho thị trường Việt Nam, tích hợp sẵn các tiện ích: Tải video nhanh, giải bài tập, tra từ điển và gõ tiếng Việt.</p>
+                    </div>
+                </div>
+
+                <!-- Edge Preview -->
+                <div id="prev-edge" class="browser-preview-content">
+                    <div class="browser-mockup">
+                        <div class="mockup-header">
+                            <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444;"></div><div class="mockup-dot" style="background:#eab308;"></div><div class="mockup-dot" style="background:#22c55e;"></div></div>
+                            <div class="mockup-url">🔒 https://www.microsoft.com/edge</div>
+                        </div>
+                        <div class="mockup-body" style="background: linear-gradient(135deg, #075985, #0f172a);">
+                            <span style="font-size: 2rem;">🌊 Microsoft Edge</span>
+                            <span style="color:#94a3b8; font-size:1rem;">Tích hợp AI Copilot hỗ trợ duyệt thông minh</span>
+                        </div>
+                    </div>
+                    <div class="browser-info">
+                        <h4>Microsoft Edge</h4>
+                        <p>Trình duyệt mặc định của hệ điều hành Windows, tiết kiệm bộ nhớ RAM và tích hợp trợ lý trí tuệ nhân tạo Copilot trực tiếp trên thanh công cụ.</p>
+                    </div>
+                </div>
+
+                <!-- Firefox Preview -->
+                <div id="prev-firefox" class="browser-preview-content">
+                    <div class="browser-mockup">
+                        <div class="mockup-header">
+                            <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444;"></div><div class="mockup-dot" style="background:#eab308;"></div><div class="mockup-dot" style="background:#22c55e;"></div></div>
+                            <div class="mockup-url">🔒 https://www.mozilla.org</div>
+                        </div>
+                        <div class="mockup-body" style="background: linear-gradient(135deg, #9a3412, #0f172a);">
+                            <span style="font-size: 2rem;">🦊 Mozilla Firefox</span>
+                            <span style="color:#94a3b8; font-size:1rem;">Bảo mật cá nhân & Mã nguồn tự do</span>
+                        </div>
+                    </div>
+                    <div class="browser-info">
+                        <h4>Mozilla Firefox</h4>
+                        <p>Trình duyệt web mã nguồn mở nổi tiếng với khả năng bảo mật quyền riêng tư cao, chống theo dõi người dùng mạnh mẽ.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NỘI DUNG 2 KỸ NĂNG SỐ BẮT BUỘC -->
+            <div class="box" style="border-left-color: #a855f7; margin-top: 5px; padding: 15px 25px;">
+                <h3 style="color: #c084fc; font-size: 1.45rem; margin-bottom: 8px;">📌 2 Kỹ năng số bắt buộc khi sử dụng trình duyệt:</h3>
+                <ol style="margin-left: 25px; font-size: 1.25rem;">
+                    <li style="margin-bottom: 6px;"><strong>Nút điều hướng:</strong> Sử dụng nút <strong>Back (←)</strong> để quay lại trang web trước đó, <strong>Forward (→)</strong> để tiến tới trang tiếp theo.</li>
+                    <li><strong>Đánh dấu trang (Bookmark):</strong> Nhấp chuột vào biểu tượng <strong>Ngôi sao (⭐)</strong> trên thanh địa chỉ để lưu lại địa chỉ các trang web học tập yêu thích giúp truy cập lại nhanh chóng.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: GAME 2 - PHÂN LOẠI ĐUÔI TÊN MIỀN -->
+        <div class="slide">
+            <h1 class="slide-title">🎮 THỬ THÁCH: ĐIỀU HƯỚNG TÊN MIỀN INTERNET</h1>
+            <p style="font-size: 1.25rem; margin-bottom: 10px;">Bấm chọn 1 <strong>Tên miền</strong> bên trên, sau đó nhấp chọn vào <strong>Hộp đuôi địa chỉ tương ứng</strong>!</p>
+
+            <div class="domain-game-container">
+                <div class="domain-options" id="domain-buttons">
+                    <button class="domain-btn" onclick="selectDomain(this, '.edu')">moet.edu.vn</button>
+                    <button class="domain-btn" onclick="selectDomain(this, '.gov')">chinhphu.gov.vn</button>
+                    <button class="domain-btn" onclick="selectDomain(this, '.vn')">tuoitre.vn</button>
+                    <button class="domain-btn" onclick="selectDomain(this, '.com')">google.com</button>
+                    <button class="domain-btn" onclick="selectDomain(this, '.edu')">hcmup.edu.vn</button>
+                    <button class="domain-btn" onclick="selectDomain(this, '.gov')">monre.gov.vn</button>
+                </div>
+
+                <div class="category-grid">
+                    <div class="category-box" onclick="placeInCategory('.edu')">
+                        <h4>.edu</h4>
+                        <p style="font-size: 1rem; color: #94a3b8;">Giáo dục / Trường học</p>
+                        <div id="cat-edu"></div>
+                    </div>
+                    <div class="category-box" onclick="placeInCategory('.gov')">
+                        <h4>.gov</h4>
+                        <p style="font-size: 1rem; color: #94a3b8;">Cơ quan Nhà nước</p>
+                        <div id="cat-gov"></div>
+                    </div>
+                    <div class="category-box" onclick="placeInCategory('.vn')">
+                        <h4>.vn</h4>
+                        <p style="font-size: 1rem; color: #94a3b8;">Tên miền Việt Nam</p>
+                        <div id="cat-vn"></div>
+                    </div>
+                    <div class="category-box" onclick="placeInCategory('.com')">
+                        <h4>.com</h4>
+                        <p style="font-size: 1rem; color: #94a3b8;">Thương mại / Quốc tế</p>
+                        <div id="cat-com"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="game2-status" style="margin-top: 15px; font-size: 1.3rem; font-weight: bold; text-align: center; color: #fbbf24; height: 30px;"></div>
+        </div>
+
+        <!-- SLIDE 7: SO SÁNH TÌM KIẾM TRUYỀN THỐNG VÀ AI -->
+        <div class="slide">
+            <h1 class="slide-titleC">3. THỰC HÀNH: SEARCH ENGINE THƯỜNG VS AI OVERVIEWS</h1>
+            <p style="font-size: 1.3rem;">So sánh khi gõ từ khóa: <em>"Thời tiết Hà Nội hôm nay"</em> hoặc <em>"Mạng Internet là gì?"</em>:</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Tiêu chí</th>
+                        <th style="width: 37.5%;">Công cụ tìm kiếm Truyền thống (Google Search)</th>
+                        <th style="width: 37.5%;">Công cụ tìm kiếm AI (Copilot / AI Overviews)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Kết quả trả về</strong></td>
+                        <td>Danh sách hàng loạt <strong>Đường liên kết (Link)</strong> tới các website.</td>
+                        <td>Tự động <strong>tổng hợp thành câu trả lời ngắn gọn</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Thao tác HS</strong></td>
+                        <td>Tự mở từng trang web để đọc chắt lọc thông tin.</td>
+                        <td>Đọc câu tóm tắt trực tiếp, có thể đặt câu hỏi tiếp.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lưu ý sử dụng</strong></td>
+                        <td>Nguồn tin rõ ràng từ các trang web nguồn.</td>
+                        <td>Cần kiểm tra đối chiếu lại độ chính xác của AI.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SLIDE 8: CYBER QUIZ SHOW (10 CÂU HỎI ĐA DẠNG) -->
+        <div class="slide">
+            <h1 class="slide-titleC">🏆 CYBER QUIZ: ĐƯỜNG LÊN ĐỈNH KIẾN THỨC SỐ (10 CÂU)</h1>
+
+            <!-- MÀN HÌNH 1: NHẬP THÔNG TIN HỌC SINH -->
+            <div id="quiz-start-screen">
+                <div class="student-form-container">
+                    <h2 style="font-size: 2rem; color: #fbbf24; margin-bottom: 20px;">📝 THÔNG TIN HỌC SINH</h2>
+                    <div class="form-group">
+                        <label for="studentName">Họ và tên học sinh:</label>
+                        <input type="text" id="studentName" class="form-input" placeholder="Ví dụ: Nguyễn Văn An" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentClass">Lớp học:</label>
+                        <input type="text" id="studentClass" class="form-input" placeholder="Ví dụ: 6A1" autocomplete="off">
+                    </div>
+                    <div id="form-error" style="color: #f87171; font-weight: bold; margin-bottom: 15px; height: 25px;"></div>
+                    <button class="btn" style="width: 100%; font-size: 1.4rem; padding: 15px;" onclick="startQuiz()">🚀 BẮT ĐẦU LÀM BÀI</button>
+                </div>
+            </div>
+
+            <!-- MÀN HÌNH 2: KHUNG CÂU HỎI -->
+            <div class="quiz-game-wrapper" id="quiz-main-screen" style="display: none;">
+                <div class="quiz-header">
+                    <span class="quiz-progress-badge" id="quiz-progress">Câu hỏi: 1 / 10</span>
+                    <span id="quiz-student-info" style="font-size: 1.1rem; color: #fbbf24; font-weight: bold;"></span>
+                    <span class="quiz-score-badge" id="quiz-score">Điểm số: 0</span>
+                </div>
+
+                <div id="quiz-note-container"></div>
+                <div class="quiz-question-box" id="quiz-question-text">
+                    Đang tải câu hỏi...
+                </div>
+
+                <div id="quiz-options-container"></div>
+
+                <div class="quiz-feedback-box">
+                    <div id="quiz-explain-text"></div>
+                    <button class="btn" id="nextQuizBtn" style="display: none; background: #16a34a;" onclick="nextQuizQuestion()">Câu tiếp theo ❯</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: VẬN DỤNG & DẶN DÒ -->
+        <div class="slide">
+            <h1 class="slide-title">5. KẾT NỐI VẬN DỤNG & DẶN DÒ</h1>
+            
+            <div class="box" style="border-left-color: #38bdf8;">
+                <h3 style="color: #38bdf8; font-size: 1.5rem; margin-bottom: 10px;">🛠️ Nhiệm vụ thực hành tại nhà:</h3>
+                <ol style="margin-left: 25px; font-size: 1.3rem;">
+                    <li>Mở trình duyệt web trên máy tính hoặc điện thoại thông minh.</li>
+                    <li>Truy cập vào trang web học tập: <code style="color: #fbbf24;">hanhtrangso.nxbgd.vn</code> hoặc <code style="color: #fbbf24;">vtv.vn</code>.</li>
+                    <li>Thực hiện <strong>lưu trang web vào Thanh đánh dấu (Bookmark bar)</strong> để truy cập lại nhanh chóng.</li>
+                </ol>
+            </div>
+
+            <div class="box" style="border-left-color: #ef4444; margin-top: 25px;">
+                <h3 style="color: #f87171; font-size: 1.5rem; margin-bottom: 10px;">📋 Dặn dò chuẩn bị bài sau:</h3>
+                <ul>
+                    <li>Ôn lại các khái niệm: WWW, Website, Trình duyệt, Siêu liên kết.</li>
+                    <li>Đọc trước nội dung <strong>Bài 7: Tìm kiếm thông tin trên Internet</strong>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CONTROLS FOOTER -->
+        <div class="controls">
+            <button class="btn" id="prevBtn" onclick="changeSlide(-1)">❮ Trang trước</button>
+            <div class="slide-number" id="slideNum">Slide 1 / 9</div>
+            <button class="btn" id="nextBtn" onclick="changeSlide(1)">Trang sau ❯</button>
+        </div>
+    </div>
+
+    <!-- THANH ĐIỀU KHIỂN LỜI GIẢNG AI (ƯU TIÊN GIỌNG NAMMINH) -->
+    <div class="tts-floating-bar" id="ttsBar">
+        <button class="tts-btn" id="btnPlayPause" onclick="toggleSpeech()">🔊 Nghe lời giảng</button>
+        <button class="tts-btn stop" onclick="stopSpeech()">⏹ Dừng</button>
+        <select id="voiceSelect" class="tts-voice-select" title="Chọn giọng đọc">
+            <option value="">Đang tải giọng NamMinh...</option>
+        </select>
+        <span class="tts-status" id="ttsStatus">Sẵn sàng</span>
+        <label class="tts-auto-label" title="Tự động đọc lời giảng khi chuyển sang slide mới">
+            <input type="checkbox" id="autoPlayCheck"> Tự động
+        </label>
+    </div>
+
+    <script>
+        // --- DÁN LINK GOOGLE APPS SCRIPT CỦA THẦY VÀO ĐÂY ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxD8FQsOmbu59z-NLJTvJRBNk-Y5gOBObdnIMtFc5b9Vaunsl2N3x00gVPAih71m3fC/exec";
+
+        // --- KỊCH BẢN LỜI GIẢNG TƯƠNG ỨNG VỚI TỪNG SLIDE ---
+        const slideScripts = [
+            "Chào mừng các em đến với tiết học môn Tin học lớp 6. Hôm nay, thầy trò chúng ta cùng khám phá Bài 6: Mạng thông tin toàn cầu, World Wide Web.",
+            "Hoạt động 1: Khởi động. Em hãy tham gia trò chơi ghép cặp kết nối thông minh, nối các thuật ngữ ở Cột A với ý nghĩa tương ứng ở Cột B.",
+            "Phần 1: Tổ chức thông tin trên Internet. Khác với sách giáo khoa được tổ chức theo thứ tự tuyến tính từng trang, thông tin trên trang web được tổ chức dưới dạng siêu văn bản và kết nối phi tuyến tính thông qua các siêu liên kết.",
+            "Các nút mạng khái niệm cốt lõi: Siêu văn bản, Trang web và Trang chủ, Website, và Mạng thông tin toàn cầu World Wide Web.",
+            "Phần 2: Trình duyệt Web và Kỹ năng số. Để truy cập các trang web, chúng ta sử dụng trình duyệt web như Chrome, Cốc Cốc, Edge hoặc Firefox. Các em hãy ghi nhớ 2 kỹ năng số bắt buộc là dùng nút điều hướng Back Forward và lưu Bookmark trang web yêu thích.",
+            "Thử thách điều hướng tên miền Internet. Em hãy phân loại các tên miền edu, gov, vn, com vào đúng nhóm của chúng.",
+            "Thực hành so sánh công cụ tìm kiếm truyền thống Google Search và công cụ tìm kiếm tích hợp AI Overviews.",
+            "Cyber Quiz Show: Đường lên đỉnh kiến thức số gồm 10 câu hỏi. Mời các em nhập họ tên, lớp và bắt đầu làm bài.",
+            "Hoạt động vận dụng và dặn dò. Về nhà, các em thực hành lưu trang web Hành trang số vào Bookmark và chuẩn bị nội dung Bài 7."
+        ];
+
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let isPaused = false;
+        let voices = [];
+
+        // Nạp danh sách giọng đọc và ép ưu tiên tuyệt đối giọng Microsoft NamMinh
+        function populateVoiceList() {
+            voices = synth.getVoices();
+            const voiceSelect = document.getElementById('voiceSelect');
+            if (!voiceSelect) return;
+            voiceSelect.innerHTML = '';
+
+            let viVoices = voices.filter(v => v.lang.toLowerCase().includes('vi') || v.name.toLowerCase().includes('vietnam'));
+            let displayVoices = viVoices.length > 0 ? viVoices : voices;
+
+            let namMinhIndex = -1;
+            let maleFallbackIndex = -1;
+
+            displayVoices.forEach((voice, index) => {
+                const option = document.createElement('option');
+                option.textContent = `${voice.name} (${voice.lang})`;
+                option.value = voices.indexOf(voice);
+
+                const vName = voice.name.toLowerCase();
+                if (vName.includes('namminh')) {
+                    namMinhIndex = index;
+                } else if (maleFallbackIndex === -1 && (vName.includes('an') || vName.includes('male') || vName.includes('nam'))) {
+                    maleFallbackIndex = index;
+                }
+                voiceSelect.appendChild(option);
+            });
+
+            if (displayVoices.length > 0) {
+                if (namMinhIndex !== -1) {
+                    voiceSelect.selectedIndex = namMinhIndex;
+                } else if (maleFallbackIndex !== -1) {
+                    voiceSelect.selectedIndex = maleFallbackIndex;
+                } else {
+                    voiceSelect.selectedIndex = 0;
+                }
+            }
+        }
+
+        populateVoiceList();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
+
+        function getScriptForCurrentSlide() {
+            if (typeof currentSlide !== 'undefined' && currentSlide < slideScripts.length && slideScripts[currentSlide]) {
+                return slideScripts[currentSlide];
+            }
+            return "Mời các em quan sát nội dung trên màn hình.";
+        }
+
+        function speakText(text) {
+            if (!('speechSynthesis' in window)) return;
+            synth.cancel();
+            isPaused = false;
+
+            // Đảm bảo nạp lại giọng nếu danh sách trước đó chưa kịp tải
+            if (voices.length === 0) {
+                populateVoiceList();
+            }
+
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentUtterance.lang = 'vi-VN';
+            currentUtterance.rate = 0.98;  // Tốc độ đọc tự nhiên cho giọng NamMinh
+            currentUtterance.pitch = 1.0;  // Cao độ chuẩn nguyên bản của giọng NamMinh
+
+            const voiceSelect = document.getElementById('voiceSelect');
+            const selectedVoiceIndex = voiceSelect ? voiceSelect.value : "";
+
+            if (selectedVoiceIndex !== "" && voices[selectedVoiceIndex]) {
+                currentUtterance.voice = voices[selectedVoiceIndex];
+            } else {
+                // Tìm trực tiếp giọng NamMinh nếu chưa chọn
+                const directNamMinh = voices.find(v => v.name.toLowerCase().includes('namminh'));
+                if (directNamMinh) currentUtterance.voice = directNamMinh;
+            }
+
+            currentUtterance.onstart = () => {
+                document.getElementById('btnPlayPause').innerHTML = "⏸ Tạm dừng";
+                document.getElementById('ttsStatus').innerText = "Đang giảng...";
+            };
+
+            currentUtterance.onend = () => {
+                document.getElementById('btnPlayPause').innerHTML = "🔊 Nghe lời giảng";
+                document.getElementById('ttsStatus').innerText = "Đã xong";
+                isPaused = false;
+            };
+
+            currentUtterance.onerror = () => {
+                document.getElementById('btnPlayPause').innerHTML = "🔊 Nghe lời giảng";
+                document.getElementById('ttsStatus').innerText = "Sẵn sàng";
+            };
+
+            synth.speak(currentUtterance);
+        }
+
+        function toggleSpeech() {
+            if (synth.speaking && !isPaused) {
+                synth.pause();
+                isPaused = true;
+                document.getElementById('btnPlayPause').innerHTML = "▶ Tiếp tục";
+                document.getElementById('ttsStatus').innerText = "Tạm dừng";
+            } else if (isPaused) {
+                synth.resume();
+                isPaused = false;
+                document.getElementById('btnPlayPause').innerHTML = "⏸ Tạm dừng";
+                document.getElementById('ttsStatus').innerText = "Đang giảng...";
+            } else {
+                speakText(getScriptForCurrentSlide());
+            }
+        }
+
+        function stopSpeech() {
+            synth.cancel();
+            isPaused = false;
+            document.getElementById('btnPlayPause').innerHTML = "🔊 Nghe lời giảng";
+            document.getElementById('ttsStatus').innerText = "Đã dừng";
+        }
+
+        // --- SLIDE NAVIGATION LOGIC ---
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) slide.classList.add('active');
+            });
+            
+            document.getElementById('slideNum').innerText = `Slide ${index + 1} / ${totalSlides}`;
+            document.getElementById('progress').style.width = `${((index + 1) / totalSlides) * 100}%`;
+
+            document.getElementById('prevBtn').disabled = (index === 0);
+            document.getElementById('nextBtn').disabled = (index === totalSlides - 1);
+
+            stopSpeech();
+            const autoCheck = document.getElementById('autoPlayCheck');
+            if (autoCheck && autoCheck.checked) {
+                setTimeout(() => speakText(getScriptForCurrentSlide()), 300);
+            }
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+            showSlide(currentSlide);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+            if (e.key === 'ArrowRight' || e.key === 'Space') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        // --- BROWSER PREVIEW LOGIC ---
+        function showBrowser(btnElement, browserKey) {
+            document.querySelectorAll('.browser-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.browser-preview-content').forEach(content => content.classList.remove('active'));
+
+            btnElement.classList.add('active');
+            document.getElementById(`prev-${browserKey}`).classList.add('active');
+        }
+
+        // --- GAME 1 LOGIC ---
+        let leftSelected = null;
+        let rightSelected = null;
+        let matchedPairsCount = 0;
+
+        function selectCard(card, side) {
+            if (card.classList.contains('correct')) return;
+
+            if (side === 'left') {
+                document.querySelectorAll('.matching-column:first-child .match-card').forEach(c => {
+                    if (!c.classList.contains('correct')) c.classList.remove('selected');
+                });
+                card.classList.add('selected');
+                leftSelected = card;
+            } else {
+                document.querySelectorAll('.matching-column:last-child .match-card').forEach(c => {
+                    if (!c.classList.contains('correct')) c.classList.remove('selected');
+                });
+                card.classList.add('selected');
+                rightSelected = card;
+            }
+
+            if (leftSelected && rightSelected) {
+                checkMatchingPair();
+            }
+        }
+
+        function checkMatchingPair() {
+            const leftId = leftSelected.getAttribute('data-id');
+            const rightId = rightSelected.getAttribute('data-id');
+
+            if (leftId === rightId) {
+                leftSelected.classList.remove('selected');
+                rightSelected.classList.remove('selected');
+                leftSelected.classList.add('correct');
+                rightSelected.classList.add('correct');
+                
+                leftSelected.innerHTML += ' <span style="float:right;">✓</span>';
+                rightSelected.innerHTML += ' <span style="float:right;">✓</span>';
+
+                matchedPairsCount++;
+                leftSelected = null;
+                rightSelected = null;
+
+                if (matchedPairsCount === 4) {
+                    document.getElementById('game1-status').innerText = "🎉 XUẤT SẮC! BẠN ĐÃ KẾT NỐI ĐÚNG TOÀN BỘ 4 CẶP KHÁI NIỆM!";
+                } else {
+                    document.getElementById('game1-status').innerText = "✅ Chính xác! Tiếp tục ghép các cặp còn lại.";
+                }
+            } else {
+                leftSelected.classList.add('wrong');
+                rightSelected.classList.add('wrong');
+                document.getElementById('game1-status').innerText = "❌ Chưa đúng rồi, thử chọn lại nhé!";
+
+                setTimeout(() => {
+                    if (leftSelected) {
+                        leftSelected.classList.remove('selected', 'wrong');
+                        leftSelected = null;
+                    }
+                    if (rightSelected) {
+                        rightSelected.classList.remove('selected', 'wrong');
+                        rightSelected = null;
+                    }
+                }, 800);
+            }
+        }
+
+        // --- GAME 2 LOGIC ---
+        let selectedDomainBtn = null;
+        let selectedTargetType = null;
+
+        function selectDomain(btn, type) {
+            document.querySelectorAll('.domain-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedDomainBtn = btn;
+            selectedTargetType = type;
+            document.getElementById('game2-status').innerText = `Đã chọn "${btn.innerText}". Hãy nhấp vào hộp phù hợp bên dưới!`;
+        }
+
+        function placeInCategory(targetType) {
+            if (!selectedDomainBtn) {
+                document.getElementById('game2-status').innerText = "⚠️ Hãy chọn một tên miền ở trên trước!";
+                return;
+            }
+
+            if (selectedTargetType === targetType) {
+                const boxId = targetType === '.edu' ? 'cat-edu' : targetType === '.gov' ? 'cat-gov' : targetType === '.vn' ? 'cat-vn' : 'cat-com';
+                const container = document.getElementById(boxId);
+                
+                const newItem = document.createElement('div');
+                newItem.classList.add('placed-item');
+                newItem.innerText = selectedDomainBtn.innerText;
+                container.appendChild(newItem);
+
+                selectedDomainBtn.style.display = 'none';
+                selectedDomainBtn = null;
+                selectedTargetType = null;
+                document.getElementById('game2-status').innerText = "✅ Chính xác!";
+            } else {
+                document.getElementById('game2-status').innerText = "❌ Chưa đúng rồi, thử lại nhé!";
+            }
+        }
+
+        // --- 10 CÂU HỎI QUIZ ĐA DẠNG ---
+        const quizData = [
+            {
+                type: "single",
+                question: "Câu 1: Thông tin trên Mạng thông tin toàn cầu (WWW) được tổ chức dưới dạng nào?",
+                options: [
+                    "A. Tương tự như thứ tự trang trong cuốn sách giáo khoa.",
+                    "B. Thành các văn bản rời rạc không có mối liên kết.",
+                    "C. Các siêu văn bản kết nối thông qua các siêu liên kết.",
+                    "D. Lưu trữ rải rác trong các thư mục ổ đĩa máy tính."
+                ],
+                correct: [2],
+                explain: "💡 Thông tin trên Web là dạng phi tuyến tính, các siêu văn bản nối với nhau bằng Siêu liên kết (Hyperlink)."
+            },
+            {
+                type: "single",
+                question: "Câu 2: Muốn quay lại trang web vừa xem trước đó trên trình duyệt, em nhấp vào nút điều hướng nào?",
+                options: [
+                    "A. Nút Back (mũi tên sang trái ←)",
+                    "B. Nút Forward (mũi tên sang phải →)",
+                    "C. Biểu tượng Ngôi sao ⭐ (Bookmark)",
+                    "D. Biểu tượng Tải lại ↻ (Reload)"
+                ],
+                correct: [0],
+                explain: "💡 Nút Back (←) dùng để quay lại trang web trước đó."
+            },
+            {
+                type: "single",
+                question: "Câu 3: Địa chỉ website có đuôi '.gov.vn' (ví dụ: chinhphu.gov.vn) thuộc loại tổ chức nào?",
+                options: [
+                    "A. Trường học / Tổ chức Giáo dục",
+                    "B. Cơ quan Nhà nước / Chính phủ Việt Nam",
+                    "C. Doanh nghiệp Thương mại",
+                    "D. Trang tin tức giải trí"
+                ],
+                correct: [1],
+                explain: "💡 Đuôi '.gov' tượng trưng cho Government (Cơ quan Chính phủ/Nhà nước)."
+            },
+            {
+                type: "single",
+                question: "Câu 4: Thao tác bấm vào biểu tượng Ngôi sao (⭐) trên thanh địa chỉ trình duyệt có tác dụng gì?",
+                options: [
+                    "A. Tắt trình duyệt web ngay lập tức",
+                    "B. Lưu trang web vào Thanh đánh dấu (Bookmark) để mở lại nhanh",
+                    "C. Xóa lịch sử truy cập trang web",
+                    "D. Phóng to màn hình trang web"
+                ],
+                correct: [1],
+                explain: "💡 Nút ngôi sao giúp đánh dấu (Bookmark) lại các trang web hay dùng."
+            },
+            {
+                type: "multi",
+                question: "Câu 5: Phần mềm nào dưới đây là Trình duyệt Web phổ biến? (Chọn 2 đáp án)",
+                options: [
+                    "A. Microsoft Word",
+                    "B. Google Chrome",
+                    "C. Bảng tính Excel",
+                    "D. Cốc Cốc"
+                ],
+                correct: [1, 3],
+                explain: "💡 Google Chrome và Cốc Cốc là các phần mềm ứng dụng trình duyệt web phổ biến."
+            },
+            {
+                type: "multi",
+                question: "Câu 6: Những tiện ích nào thường có sẵn trên trình duyệt Cốc Cốc dành riêng cho người Việt? (Chọn 2 đáp án)",
+                options: [
+                    "A. Tra từ điển và hỗ trợ gõ tiếng Việt",
+                    "B. Thiết kế mạch điện tử tự động",
+                    "C. Tải video nhanh từ các trang mạng",
+                    "D. Điều khiển cánh tay robot công nghiệp"
+                ],
+                correct: [0, 2],
+                explain: "💡 Cốc Cốc tích hợp sẵn công cụ tải video nhanh, tra từ điển và gõ tiếng Việt tiện lợi."
+            },
+            {
+                type: "multi",
+                question: "Câu 7: Đâu là các đặc điểm nổi bật của Mạng thông tin toàn cầu WWW? (Chọn 2 đáp án)",
+                options: [
+                    "A. Chỉ xem được nội dung tĩnh không có hình ảnh",
+                    "B. Chứa đa dạng tài nguyên: văn bản, hình ảnh, âm thanh, video",
+                    "C. Bắt buộc phải in ra giấy mới đọc được",
+                    "D. Tổ chức thông tin theo kiểu phi tuyến tính qua siêu liên kết"
+                ],
+                correct: [1, 3],
+                explain: "💡 WWW chứa đa dạng tài nguyên đa phương tiện và liên kết phi tuyến tính qua các siêu văn bản."
+            },
+            {
+                type: "single",
+                question: "Câu 8 (Đúng/Sai): Công cụ tìm kiếm tích hợp AI (như Copilot) tự động tổng hợp thông tin và đưa ra câu trả lời trực tiếp thay vì chỉ trả về danh sách link.",
+                options: [
+                    "A. Đúng",
+                    "B. Sai"
+                ],
+                correct: [0],
+                explain: "💡 Phát biểu đúng: AI Overviews / Copilot đọc và tổng hợp thành câu trả lời trực tiếp cho người dùng."
+            },
+            {
+                type: "single",
+                question: "Câu 9 (Đúng/Sai): Sách giáo khoa truyền thống được tổ chức theo hình thức phi tuyến tính giống như các trang web trên Internet.",
+                options: [
+                    "A. Đúng",
+                    "B. Sai"
+                ],
+                correct: [1],
+                explain: "💡 Phát biểu sai: Sách giáo khoa tổ chức theo tuyến tính (theo thứ tự tuần tự), còn mạng web tổ chức phi tuyến tính."
+            },
+            {
+                type: "match",
+                question: "Câu 10: Hãy ghép nối các phần mở rộng tên miền ở Cột A với ý nghĩa tương ứng ở Cột B",
+                pairs: [
+                    { id: 1, a: ".edu.vn", b: "Các trường học, cơ sở giáo dục" },
+                    { id: 2, a: ".gov.vn", b: "Cơ quan nhà nước, chính phủ" },
+                    { id: 3, a: ".com", b: "Tổ chức thương mại, doanh nghiệp" }
+                ],
+                explain: "💡 Giải thích: .edu (Education) dùng cho giáo dục, .gov (Government) dùng cho cơ quan nhà nước, .com (Commercial) dùng cho thương mại."
+            }
+        ];
+
+        let studentFullname = "";
+        let studentClassname = "";
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+        let quizAnswered = false;
+        let selectedMultiAnswers = [];
+
+        let quizStartTime = null;
+        let totalDurationText = "";
+
+        let selectedAItem = null;
+        let selectedBItem = null;
+        let matchedCount = 0;
+
+        function startQuiz() {
+            const nameInput = document.getElementById('studentName').value.trim();
+            const classInput = document.getElementById('studentClass').value.trim();
+
+            if (!nameInput || !classInput) {
+                document.getElementById('form-error').innerText = "⚠️ Em hãy nhập đầy đủ Họ tên và Lớp trước khi làm bài!";
+                return;
+            }
+
+            studentFullname = nameInput;
+            studentClassname = classInput;
+            quizStartTime = new Date();
+
+            document.getElementById('quiz-start-screen').style.display = "none";
+            document.getElementById('quiz-main-screen').style.display = "block";
+            document.getElementById('quiz-student-info').innerText = `👤 ${studentFullname} - Lớp ${studentClassname}`;
+
+            currentQuizIndex = 0;
+            quizScore = 0;
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            quizAnswered = false;
+            selectedMultiAnswers = [];
+            selectedAItem = null;
+            selectedBItem = null;
+            matchedCount = 0;
+
+            const currentQ = quizData[currentQuizIndex];
+            
+            document.getElementById('quiz-progress').innerText = `Câu hỏi: ${currentQuizIndex + 1} / ${quizData.length}`;
+            document.getElementById('quiz-score').innerText = `Điểm số: ${quizScore}`;
+            document.getElementById('quiz-question-text').innerText = currentQ.question;
+            document.getElementById('quiz-explain-text').innerHTML = "";
+            document.getElementById('nextQuizBtn').style.display = "none";
+
+            const noteContainer = document.getElementById('quiz-note-container');
+            const optionsContainer = document.getElementById('quiz-options-container');
+            optionsContainer.innerHTML = "";
+
+            if (currentQ.type === 'multi') {
+                noteContainer.innerHTML = `<div class="quiz-note">📌 Lưu ý: Câu hỏi này có <strong>2 đáp án đúng</strong>. Em hãy chọn đủ 2 đáp án rồi bấm xác nhận!</div>`;
+            } else if (currentQ.type === 'match') {
+                noteContainer.innerHTML = `<div class="quiz-note">📌 Hướng dẫn: Bấm chọn 1 ý ở Cột A, sau đó bấm chọn ý tương ứng ở Cột B để ghép nối (Cột B đã được sắp xếp chéo)!</div>`;
+            } else {
+                noteContainer.innerHTML = "";
+            }
+
+            if (currentQ.type === 'single') {
+                optionsContainer.className = "quiz-options-grid";
+                currentQ.options.forEach((optText, i) => {
+                    const optBtn = document.createElement('div');
+                    optBtn.classList.add('quiz-game-opt');
+                    optBtn.innerText = optText;
+                    optBtn.onclick = () => selectSingleAnswer(optBtn, i);
+                    optionsContainer.appendChild(optBtn);
+                });
+            } else if (currentQ.type === 'multi') {
+                optionsContainer.className = "quiz-options-grid";
+                currentQ.options.forEach((optText, i) => {
+                    const optBtn = document.createElement('div');
+                    optBtn.classList.add('quiz-game-opt');
+                    optBtn.innerText = optText;
+                    optBtn.onclick = () => selectMultiAnswer(optBtn, i);
+                    optionsContainer.appendChild(optBtn);
+                });
+
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = 'btn';
+                confirmBtn.style.gridColumn = '1 / -1';
+                confirmBtn.style.marginTop = '10px';
+                confirmBtn.style.background = 'linear-gradient(135deg, #d97706, #b45309)';
+                confirmBtn.innerText = '✨ Xác nhận câu trả lời';
+                confirmBtn.onclick = checkMultiAnswer;
+                optionsContainer.appendChild(confirmBtn);
+            } else if (currentQ.type === 'match') {
+                optionsContainer.className = "";
+                let fixedCrossB = [currentQ.pairs[1], currentQ.pairs[2], currentQ.pairs[0]];
+
+                let htmlContent = `
+                    <div class="match-columns-wrapper">
+                        <div class="match-col">
+                            <h4>Cột A (Tên miền)</h4>
+                            <div id="col-a-items">
+                                ${currentQ.pairs.map(p => `<div class="match-item" data-id="${p.id}" onclick="selectMatchA(this)">${p.a}</div>`).join('')}
+                            </div>
+                        </div>
+                        <div class="match-col">
+                            <h4>Cột B (Ý nghĩa)</h4>
+                            <div id="col-b-items">
+                                ${fixedCrossB.map(p => `<div class="match-item" data-id="${p.id}" onclick="selectMatchB(this)">${p.b}</div>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                optionsContainer.innerHTML = htmlContent;
+            }
+        }
+
+        function selectSingleAnswer(btnElement, selectedIndex) {
+            if (quizAnswered) return;
+            quizAnswered = true;
+
+            const currentQ = quizData[currentQuizIndex];
+            const allOpts = document.querySelectorAll('.quiz-game-opt');
+
+            if (currentQ.correct.includes(selectedIndex)) {
+                btnElement.classList.add('correct');
+                quizScore += 10;
+                document.getElementById('quiz-score').innerText = `Điểm số: ${quizScore}`;
+                document.getElementById('quiz-explain-text').innerHTML = `<span style="color: #4ade80;">🎉 CHÍNH XÁC! (+10 điểm)</span><br><span style="font-size: 1.1rem; color: #cbd5e1;">${currentQ.explain}</span>`;
+            } else {
+                btnElement.classList.add('wrong');
+                currentQ.correct.forEach(correctIdx => {
+                    allOpts[correctIdx].classList.add('correct');
+                });
+                document.getElementById('quiz-explain-text').innerHTML = `<span style="color: #f87171;">❌ CHƯA ĐÚNG RỒI!</span><br><span style="font-size: 1.1rem; color: #cbd5e1;">${currentQ.explain}</span>`;
+            }
+
+            showNextButton();
+        }
+
+        function selectMultiAnswer(btnElement, index) {
+            if (quizAnswered) return;
+            const pos = selectedMultiAnswers.indexOf(index);
+            if (pos > -1) {
+                selectedMultiAnswers.splice(pos, 1);
+                btnElement.classList.remove('selected-multi');
+            } else {
+                if (selectedMultiAnswers.length < 2) {
+                    selectedMultiAnswers.push(index);
+                    btnElement.classList.add('selected-multi');
+                }
+            }
+        }
+
+        function checkMultiAnswer() {
+            if (quizAnswered) return;
+            if (selectedMultiAnswers.length !== 2) {
+                alert("⚠️ Em vui lòng chọn đúng 2 đáp án trước khi xác nhận!");
+                return;
+            }
+            quizAnswered = true;
+
+            const currentQ = quizData[currentQuizIndex];
+            const allOpts = document.querySelectorAll('.quiz-game-opt');
+            const isCorrect = selectedMultiAnswers.sort().toString() === currentQ.correct.sort().toString();
+
+            allOpts.forEach((opt, idx) => {
+                if (currentQ.correct.includes(idx)) {
+                    opt.classList.add('correct');
+                } else if (selectedMultiAnswers.includes(idx)) {
+                    opt.classList.add('wrong');
+                }
+            });
+
+            if (isCorrect) {
+                quizScore += 10;
+                document.getElementById('quiz-score').innerText = `Điểm số: ${quizScore}`;
+                document.getElementById('quiz-explain-text').innerHTML = `<span style="color: #4ade80;">🎉 XUẤT SẮC, CHÍNH XÁC CẢ 2 Ý! (+10 điểm)</span><br><span style="font-size: 1.1rem; color: #cbd5e1;">${currentQ.explain}</span>`;
+            } else {
+                document.getElementById('quiz-explain-text').innerHTML = `<span style="color: #f87171;">❌ CHƯA ĐÚNG HOẶC CHƯA ĐỦ!</span><br><span style="font-size: 1.1rem; color: #cbd5e1;">${currentQ.explain}</span>`;
+            }
+
+            showNextButton();
+        }
+
+        function selectMatchA(element) {
+            if (quizAnswered || element.classList.contains('paired')) return;
+            document.querySelectorAll('#col-a-items .match-item').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedAItem = element;
+            checkMatchPair();
+        }
+
+        function selectMatchB(element) {
+            if (quizAnswered || element.classList.contains('paired')) return;
+            document.querySelectorAll('#col-b-items .match-item').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedBItem = element;
+            checkMatchPair();
+        }
+
+        function checkMatchPair() {
+            if (selectedAItem && selectedBItem) {
+                const idA = selectedAItem.getAttribute('data-id');
+                const idB = selectedBItem.getAttribute('data-id');
+
+                if (idA === idB) {
+                    selectedAItem.classList.remove('selected');
+                    selectedBItem.classList.remove('selected');
+                    selectedAItem.classList.add('paired');
+                    selectedBItem.classList.add('paired');
+
+                    matchedCount++;
+                    selectedAItem = null;
+                    selectedBItem = null;
+
+                    if (matchedCount === 3) {
+                        quizAnswered = true;
+                        quizScore += 10;
+                        document.getElementById('quiz-score').innerText = `Điểm số: ${quizScore}`;
+                        document.getElementById('quiz-explain-text').innerHTML = `<span style="color: #4ade80;">🎉 HOÀN THÀNH XUẤT SẮC CẶP GHÉP NỐI! (+10 điểm)</span>`;
+                        showNextButton();
+                    }
+                } else {
+                    selectedAItem.classList.add('wrong');
+                    selectedBItem.classList.add('wrong');
+                    setTimeout(() => {
+                        if (selectedAItem) selectedAItem.classList.remove('selected', 'wrong');
+                        if (selectedBItem) selectedBItem.classList.remove('selected', 'wrong');
+                        selectedAItem = null;
+                        selectedBItem = null;
+                    }, 600);
+                }
+            }
+        }
+
+        function showNextButton() {
+            if (currentQuizIndex < quizData.length - 1) {
+                document.getElementById('nextQuizBtn').style.display = "inline-block";
+                document.getElementById('nextQuizBtn').innerText = "Câu tiếp theo ❯";
+            } else {
+                document.getElementById('nextQuizBtn').style.display = "inline-block";
+                document.getElementById('nextQuizBtn').innerText = "Xem KẾT QUẢ 🏆";
+            }
+        }
+
+        function nextQuizQuestion() {
+            currentQuizIndex++;
+            if (currentQuizIndex < quizData.length) {
+                loadQuizQuestion();
+            } else {
+                showFinalQuizResult();
+            }
+        }
+
+        function showFinalQuizResult() {
+            const endTime = new Date();
+            const durationInSeconds = Math.floor((endTime - quizStartTime) / 1000);
+            const minutes = Math.floor(durationInSeconds / 60);
+            const seconds = durationInSeconds % 60;
+            totalDurationText = `${minutes} phút ${seconds} giây`;
+
+            document.getElementById('quiz-progress').innerText = `HOÀN THÀNH!`;
+            document.getElementById('quiz-question-text').innerHTML = `🏆 TỔNG KẾT CYBER QUIZ SHOW!`;
+            document.getElementById('quiz-note-container').innerHTML = "";
+            
+            const optionsContainer = document.getElementById('quiz-options-container');
+            optionsContainer.className = "";
+            optionsContainer.innerHTML = `
+                <div style="text-align: center; padding: 25px; background: rgba(30, 41, 59, 0.8); border-radius: 16px; border: 2px solid #fbbf24; box-shadow: 0 0 25px rgba(251, 191, 36, 0.3);">
+                    <h2 style="font-size: 2rem; color: #fbbf24; margin-bottom: 8px;">Học sinh: ${studentFullname} - Lớp ${studentClassname}</h2>
+                    <h3 style="font-size: 2.3rem; color: #38bdf8; margin-bottom: 8px;">Điểm số: ${quizScore} / 100 ĐIỂM</h3>
+                    <p style="font-size: 1.4rem; color: #a855f7; font-weight: bold; margin-bottom: 15px;">⏱️ Thời gian hoàn thành: ${totalDurationText}</p>
+                    <p id="sync-status" style="font-size: 1.2rem; color: #fbbf24; margin-top: 10px;">⏳ Đang đồng bộ kết quả về Google Sheet...</p>
+                </div>
+            `;
+            document.getElementById('quiz-explain-text').innerHTML = "";
+            document.getElementById('nextQuizBtn').style.display = "none";
+
+            sendResultToGoogleSheet(studentFullname, studentClassname, quizScore, totalDurationText);
+        }
+
+        function sendResultToGoogleSheet(name, className, score, duration) {
+            if (SCRIPT_URL.includes("DÁN_LINK")) {
+                document.getElementById('sync-status').innerHTML = "⚠️ <span style='color: #f87171;'>Chưa dán Web App URL Google Apps Script!</span>";
+                return;
+            }
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fullname: name,
+                    classname: className,
+                    score: score,
+                    duration: duration
+                })
+            }).then(() => {
+                document.getElementById('sync-status').innerHTML = "✅ <span style='color: #4ade80;'>Đã ghi nhận kết quả thành công vào Google Sheet!</span>";
+            }).catch(err => {
+                document.getElementById('sync-status').innerHTML = "❌ <span style='color: #f87171;'>Lỗi kết nối mạng!</span>";
+            });
+        }
+
+        showSlide(0);
+    </script>
+</body>
+</html>
