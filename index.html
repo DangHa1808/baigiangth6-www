@@ -716,6 +716,61 @@
         tr:nth-child(odd) {
             background-color: rgba(15, 23, 42, 0.6);
         }
+    
+        .slide { height: calc(100% - 116px); }
+        .voice-toolbar {
+            min-height: 46px;
+            padding: 5px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 7px;
+            background: rgba(8, 18, 34, 0.96);
+            border-top: 1px solid rgba(56, 189, 248, 0.16);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+            color: #cbd5e1;
+            z-index: 3;
+        }
+        .voice-toolbar-title {
+            color: #7dd3fc;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: .7px;
+            margin-right: 5px;
+            white-space: nowrap;
+        }
+        .voice-pulse {
+            display: inline-block; width: 7px; height: 7px; margin-right: 5px;
+            border-radius: 50%; background: #64748b; vertical-align: middle;
+        }
+        .voice-pulse.speaking { background: #4ade80; box-shadow: 0 0 10px #4ade80; animation: voiceBlink 1s infinite; }
+        @keyframes voiceBlink { 50% { opacity: .35; } }
+        .voice-btn {
+            border: 1px solid rgba(56,189,248,.35);
+            color: #e2e8f0; background: rgba(30,41,59,.92);
+            border-radius: 7px; padding: 6px 10px; cursor: pointer;
+            font-size: .78rem; font-weight: 650; white-space: nowrap;
+        }
+        .voice-btn:hover { background: rgba(3,105,161,.85); border-color: #38bdf8; }
+        .voice-btn.voice-primary { background: linear-gradient(135deg,#0369a1,#075985); color: white; }
+        .voice-rate-label { font-size: .76rem; color: #94a3b8; }
+        .voice-select {
+            background: #1e293b; color: #e2e8f0; border: 1px solid #475569;
+            border-radius: 6px; padding: 5px 6px; font-size: .76rem;
+        }
+        .voice-status { color: #94a3b8; font-size: .72rem; min-width: 125px; text-align: left; }
+        @media (max-width: 760px) {
+            .slide { height: calc(100% - 150px); padding: 22px 18px; }
+            .voice-toolbar { gap: 5px; padding: 6px; }
+            .voice-toolbar-title { display: none; }
+            .voice-btn { padding: 6px 7px; font-size: .7rem; }
+            .voice-status { min-width: 100%; text-align: center; }
+            .controls { padding: 0 10px; }
+            .controls .btn { padding: 9px 12px; font-size: .9rem; }
+            .slide-number { font-size: .95rem; }
+        }
+
     </style>
 </head>
 <body>
@@ -734,7 +789,9 @@
                 <p style="font-size: 2.0rem; color: #38bdf8; font-weight: bold;">Giáo viên: ĐẶNG ĐĂNG HÀ</p>
 
                 <div class="box" style="max-width: 850px; margin: 35px auto 0; text-align: left; border-left-color: #a855f7;">
-                    🎯 <strong style="color: #c084fc;">MỤC TIÊU BÀI HỌC KẾT NỐI:</strong>
+                    🎯<a href="clip.mp4" target="_blank" style="text-decoration: none;">
+						<strong style="color: #c084fc; cursor: pointer;">MỤC TIÊU BÀI HỌC KẾT NỐI:</strong>
+					</a>
                     <ul>
                         <li>Hiểu bản chất World Wide Web (WWW), Website, Trình duyệt, Siêu liên kết.</li>
                         <li>Thao tác thành thạo trình duyệt web để truy cập và lưu địa chỉ học tập (Bookmark).</li>
@@ -1098,6 +1155,23 @@
         </div>
 
         <!-- CONTROLS FOOTER -->
+
+    <div class="voice-toolbar" id="voiceToolbar" aria-label="Điều khiển thuyết minh">
+        <div class="voice-toolbar-title"><span class="voice-pulse" id="voicePulse"></span> THUYẾT MINH AI</div>
+        <button class="voice-btn voice-primary" id="voiceEnableBtn" type="button" onclick="enableAutoNarration()">▶ Bật tự động</button>
+        <button class="voice-btn" type="button" onclick="readCurrentSlide()">🔊 Đọc slide</button>
+        <button class="voice-btn" type="button" onclick="pauseNarration()">⏸ Tạm dừng</button>
+        <button class="voice-btn" type="button" onclick="resumeNarration()">▶ Tiếp tục</button>
+        <button class="voice-btn" type="button" onclick="stopNarration()">■ Dừng</button>
+        <label class="voice-rate-label" for="voiceRate">Tốc độ</label>
+        <select id="voiceRate" class="voice-select" aria-label="Tốc độ đọc">
+            <option value="0.85">Chậm</option>
+            <option value="0.95" selected>Vừa</option>
+            <option value="1.05">Nhanh</option>
+        </select>
+        <span id="voiceStatus" class="voice-status" aria-live="polite">Chưa bật thuyết minh</span>
+    </div>
+
         <div class="controls">
             <button class="btn" id="prevBtn" onclick="changeSlide(-1)">❮ Trang trước</button>
             <div class="slide-number" id="slideNum">Slide 1 / 9</div>
@@ -1125,6 +1199,15 @@
 
             document.getElementById('prevBtn').disabled = (index === 0);
             document.getElementById('nextBtn').disabled = (index === totalSlides - 1);
+
+            // Không để giọng đọc slide cũ chồng lên slide mới.
+            if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+            setVoiceStatus(narrationEnabled ? "Đang chuyển slide..." : "Chưa bật thuyết minh", false);
+            if (narrationEnabled) {
+                window.setTimeout(() => {
+                    if (narrationEnabled && currentSlide === index) readCurrentSlide();
+                }, 300);
+            }
         }
 
         function changeSlide(direction) {
@@ -1691,6 +1774,163 @@
                 document.getElementById('sync-status').innerHTML = "❌ <span style='color: #f87171;'>Lỗi kết nối mạng, chưa thể ghi nhận kết quả!</span>";
             });
         }
+
+
+        // =========================================================
+        // THUYẾT MINH TỰ ĐỘNG THEO SLIDE - WEB SPEECH API
+        // Giọng ưu tiên: tiếng Việt, tìm giọng nam nếu trình duyệt cung cấp.
+        // =========================================================
+        let narrationEnabled = false;
+        let narrationVoices = [];
+        let activeUtterance = null;
+        let lastNarratedQuizQuestion = "";
+        let quizQuestionObserver = null;
+
+        function setVoiceStatus(message, speaking = false) {
+            const status = document.getElementById("voiceStatus");
+            const pulse = document.getElementById("voicePulse");
+            if (status) status.textContent = message;
+            if (pulse) pulse.classList.toggle("speaking", speaking);
+        }
+
+        function loadVietnameseVoices() {
+            if (!("speechSynthesis" in window)) {
+                setVoiceStatus("Trình duyệt không hỗ trợ đọc giọng nói");
+                return;
+            }
+            narrationVoices = window.speechSynthesis.getVoices() || [];
+        }
+
+        function chooseVietnameseMaleVoice() {
+            if (!narrationVoices.length) loadVietnameseVoices();
+            const viVoices = narrationVoices.filter(v => /^vi([-_]|$)/i.test(v.lang) || /vietnamese|tiếng việt/i.test(v.name));
+            const maleHints = /male|nam|man|male voice/i;
+            // Một số trình duyệt không công bố giới tính giọng đọc; khi đó ưu tiên giọng tiếng Việt mặc định.
+            return viVoices.find(v => maleHints.test(v.name)) ||
+                   viVoices.find(v => /google|microsoft/i.test(v.name)) ||
+                   viVoices[0] ||
+                   narrationVoices.find(v => maleHints.test(v.name)) ||
+                   narrationVoices[0] || null;
+        }
+
+        function speakNarration(text, label = "Đang đọc") {
+            if (!("speechSynthesis" in window)) {
+                setVoiceStatus("Máy/trình duyệt chưa hỗ trợ giọng đọc");
+                return;
+            }
+            const cleanText = (text || "").replace(/\s+/g, " ").trim();
+            if (!cleanText) {
+                setVoiceStatus("Slide này chưa có nội dung để đọc");
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+            activeUtterance = new SpeechSynthesisUtterance(cleanText);
+            const voice = chooseVietnameseMaleVoice();
+            if (voice) {
+                activeUtterance.voice = voice;
+                activeUtterance.lang = voice.lang || "vi-VN";
+            } else {
+                activeUtterance.lang = "vi-VN";
+            }
+            activeUtterance.rate = Number(document.getElementById("voiceRate")?.value || 0.95);
+            activeUtterance.pitch = 0.92;
+            activeUtterance.volume = 1;
+            activeUtterance.onstart = () => setVoiceStatus(label, true);
+            activeUtterance.onend = () => setVoiceStatus("Đã đọc xong", false);
+            activeUtterance.onerror = (event) => {
+                if (event.error !== "canceled" && event.error !== "interrupted") {
+                    setVoiceStatus("Không phát được giọng đọc", false);
+                } else {
+                    setVoiceStatus("Đã dừng", false);
+                }
+            };
+            window.speechSynthesis.speak(activeUtterance);
+        }
+
+        function getSlideNarrationText(slide) {
+            if (!slide) return "";
+            const clone = slide.cloneNode(true);
+            clone.querySelectorAll(
+                "button, input, select, textarea, script, style, svg, #quiz-options-container, #quiz-explain-text, #nextQuizBtn, .voice-toolbar"
+            ).forEach(el => el.remove());
+
+            // Bỏ các vùng ẩn (ví dụ các tab xem trước trình duyệt chưa được chọn).
+            const originalNodes = slide.querySelectorAll("*");
+            const clonedNodes = clone.querySelectorAll("*");
+            originalNodes.forEach((node, index) => {
+                if (clonedNodes[index] && window.getComputedStyle(node).display === "none") {
+                    clonedNodes[index].remove();
+                }
+            });
+
+            return (clone.innerText || clone.textContent || "")
+                .replace(/[🔊▶⏸■❮❯⭐💡🌐📖🚀🎯🏆]/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
+        function readCurrentSlide() {
+            const slide = slides[currentSlide];
+            speakNarration(getSlideNarrationText(slide), `Đang thuyết minh slide ${currentSlide + 1}`);
+        }
+
+        function enableAutoNarration() {
+            if (!("speechSynthesis" in window)) {
+                setVoiceStatus("Hãy dùng Chrome hoặc Edge phiên bản mới");
+                return;
+            }
+            narrationEnabled = true;
+            const btn = document.getElementById("voiceEnableBtn");
+            if (btn) btn.textContent = "✓ Tự động: BẬT";
+            setVoiceStatus("Đã bật thuyết minh tự động");
+            // Việc bấm nút là thao tác người dùng, giúp trình duyệt cho phép phát tiếng.
+            readCurrentSlide();
+        }
+
+        function pauseNarration() {
+            if ("speechSynthesis" in window && window.speechSynthesis.speaking) {
+                window.speechSynthesis.pause();
+                setVoiceStatus("Đang tạm dừng", false);
+            }
+        }
+
+        function resumeNarration() {
+            if ("speechSynthesis" in window && window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+                setVoiceStatus("Đang đọc tiếp", true);
+            }
+        }
+
+        function stopNarration() {
+            if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+            setVoiceStatus("Đã dừng", false);
+        }
+
+        function observeQuizQuestion() {
+            const questionNode = document.getElementById("quiz-question-text");
+            if (!questionNode || quizQuestionObserver) return;
+            quizQuestionObserver = new MutationObserver(() => {
+                if (!narrationEnabled) return;
+                const question = (questionNode.innerText || questionNode.textContent || "").trim();
+                if (!question || question === lastNarratedQuizQuestion) return;
+                lastNarratedQuizQuestion = question;
+                // Chỉ đọc nội dung câu hỏi; tuyệt đối không đọc lựa chọn/đáp án trước khi học sinh trả lời.
+                window.setTimeout(() => {
+                    if (narrationEnabled && currentSlide === 7) {
+                        speakNarration(question, "Đang đọc câu hỏi Quiz");
+                    }
+                }, 250);
+            });
+            quizQuestionObserver.observe(questionNode, { childList: true, subtree: true, characterData: true });
+        }
+
+        if ("speechSynthesis" in window) {
+            loadVietnameseVoices();
+            window.speechSynthesis.onvoiceschanged = loadVietnameseVoices;
+        }
+        observeQuizQuestion();
+
 
         showSlide(0);
     </script>
